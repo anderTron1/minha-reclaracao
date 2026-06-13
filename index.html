@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História ♥</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose:    #c0565a;
+    --blush:   #e8a0a3;
+    --cream:   #fdf6f0;
+    --wine:    #6b1f2a;
+    --gold:    #c9a96e;
+    --dark:    #1a0a0e;
+    --smoke:   rgba(26,10,14,0.55);
+  }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--dark);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ─── PETALS ─── */
+  .petals {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute; top: -60px;
+    width: 14px; height: 14px;
+    background: radial-gradient(circle at 40% 40%, #f2b5b8, #c0565a88);
+    border-radius: 80% 0 80% 0;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ─── ENTRY SCREEN ─── */
+  #entry {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 60%, #3b0d14 0%, var(--dark) 70%);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+  #entry.hidden { opacity: 0; pointer-events: none; transform: scale(1.04); }
+
+  .heart-pulse {
+    font-size: 64px; margin-bottom: 24px;
+    animation: heartbeat 1.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 18px #c0565a);
+  }
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    14%      { transform: scale(1.18); }
+    28%      { transform: scale(1); }
+    42%      { transform: scale(1.12); }
+    56%      { transform: scale(1); }
+  }
+
+  .entry-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    font-weight: 300;
+    color: var(--cream);
+    letter-spacing: 0.12em;
+    text-align: center;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .entry-subtitle {
+    font-size: 0.85rem;
+    color: var(--blush);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 52px;
+  }
+
+  .enter-btn {
+    position: relative;
+    padding: 16px 52px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: 0.18em;
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    overflow: hidden;
+    transition: color 0.4s;
+  }
+  .enter-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--wine), var(--rose));
+    transform: translateX(-100%);
+    transition: transform 0.45s ease;
+    z-index: -1;
+  }
+  .enter-btn:hover::before { transform: translateX(0); }
+  .enter-btn:hover { border-color: var(--rose); }
+
+  .corner-deco {
+    position: absolute;
+    width: 56px; height: 56px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: 0.45;
+  }
+  .corner-deco.tl { top: 28px; left: 28px; border-width: 1px 0 0 1px; }
+  .corner-deco.tr { top: 28px; right: 28px; border-width: 1px 1px 0 0; }
+  .corner-deco.bl { bottom: 28px; left: 28px; border-width: 0 0 1px 1px; }
+  .corner-deco.br { bottom: 28px; right: 28px; border-width: 0 1px 1px 0; }
+
+  /* ─── CAROUSEL SCREEN ─── */
+  #carousel-screen {
+    position: fixed; inset: 0; z-index: 50;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1.2s ease 0.4s;
+  }
+  #carousel-screen.visible { opacity: 1; pointer-events: all; }
+
+  /* slides */
+  .slides-wrap {
+    position: absolute; inset: 0;
+  }
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; background: #0d0408;
+  }
+  .slide.active { opacity: 1; }
+  .slide img { width:100%; height:100%; object-fit:contain; display:block; }
+  .slide::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(26,10,14,0.18) 0%, rgba(26,10,14,0.62) 100%);
+  }
+
+  /* caption */
+  .caption {
+    position: absolute; bottom: 110px; left: 0; right: 0;
+    text-align: center; z-index: 10;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s;
+  }
+  .slide.active .caption { opacity: 1; transform: translateY(0); }
+  .caption-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 3.5vw, 2rem);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--cream);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+    letter-spacing: 0.05em;
+  }
+
+  /* progress bar */
+  .progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+    width: 0%;
+    z-index: 20;
+    transition: none;
+  }
+
+  /* dots */
+  .dots {
+    position: absolute; bottom: 52px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 10px; z-index: 20;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .dot.active { background: var(--gold); transform: scale(1.3); }
+
+  /* nav arrows */
+  .nav-arrow {
+    position: absolute; top: 50%; z-index: 20;
+    transform: translateY(-50%);
+    background: rgba(26,10,14,0.45);
+    border: 1px solid rgba(201,169,110,0.35);
+    color: var(--cream);
+    font-size: 1.4rem;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+    backdrop-filter: blur(4px);
+  }
+  .nav-arrow:hover { background: rgba(107,31,42,0.65); border-color: var(--gold); }
+  .nav-arrow.prev { left: 20px; }
+  .nav-arrow.next { right: 20px; }
+
+  /* music pill */
+  .music-pill {
+    position: absolute; top: 22px; right: 22px; z-index: 30;
+    display: flex; align-items: center; gap: 9px;
+    background: rgba(26,10,14,0.6);
+    border: 1px solid rgba(201,169,110,0.3);
+    border-radius: 30px;
+    padding: 8px 16px;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: border-color 0.3s;
+    text-decoration: none;
+  }
+  .music-pill:hover { border-color: var(--gold); }
+  .music-note { color: var(--gold); font-size: 1rem; }
+  .music-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--blush);
+  }
+  .eq-bars { display: flex; gap: 2px; align-items: flex-end; height: 14px; }
+  .eq-bar {
+    width: 3px; background: var(--rose);
+    border-radius: 2px;
+    animation: eq 0.7s ease-in-out infinite alternate;
+  }
+  .eq-bar:nth-child(1) { height: 6px;  animation-delay: 0s; }
+  .eq-bar:nth-child(2) { height: 12px; animation-delay: 0.12s; }
+  .eq-bar:nth-child(3) { height: 8px;  animation-delay: 0.24s; }
+  .eq-bar:nth-child(4) { height: 14px; animation-delay: 0.06s; }
+  @keyframes eq { to { height: 4px; } }
+
+  /* YouTube hidden iframe */
+  #yt-player { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+  /* ─── EDIT MODAL ─── */
+  #edit-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,10,14,0.88);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  #edit-modal.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: #1e0a10;
+    border: 1px solid var(--gold);
+    padding: 36px 40px;
+    max-width: 460px; width: 90%;
+    position: relative;
+  }
+  .modal-box h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .modal-box p {
+    font-size: 0.78rem;
+    color: var(--blush);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .modal-box label { font-size: 0.75rem; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .modal-box input, .modal-box textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,169,110,0.3);
+    color: var(--cream);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .modal-box input:focus, .modal-box textarea:focus { border-color: var(--gold); }
+  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--blush); padding: 9px 22px; cursor: pointer; font-size: 0.8rem; letter-spacing: 0.1em; }
+  .btn-save { background: var(--wine); border: 1px solid var(--rose); color: var(--cream); padding: 9px 22px; cursor: pointer; font-size: 0.8rem; letter-spacing: 0.1em; }
+  .btn-save:hover { background: var(--rose); }
+  .close-modal { position: absolute; top: 14px; right: 18px; background: none; border: none; color: var(--blush); font-size: 1.2rem; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- Petals -->
+<div class="petals" id="petals"></div>
+
+<!-- YouTube player (hidden) -->
+<div id="yt-player"></div>
+
+<!-- ─── ENTRY SCREEN ─── -->
+<div id="entry">
+  <div class="corner-deco tl"></div>
+  <div class="corner-deco tr"></div>
+  <div class="corner-deco bl"></div>
+  <div class="corner-deco br"></div>
+  <div class="heart-pulse">♥</div>
+  <h1 class="entry-title">Nossa História</h1>
+  <p class="entry-subtitle">um momento só nosso</p>
+  <button class="enter-btn" id="enter-btn">✦ Abrir ✦</button>
+</div>
+
+<!-- ─── CAROUSEL SCREEN ─── -->
+<div id="carousel-screen">
+
+  <!-- Music pill -->
+  <a class="music-pill" id="music-btn" href="#" onclick="toggleMusic(event)">
+    <span class="music-note">♪</span>
+    <span class="music-label">Música</span>
+    <div class="eq-bars">
+      <div class="eq-bar"></div><div class="eq-bar"></div>
+      <div class="eq-bar"></div><div class="eq-bar"></div>
+    </div>
+  </a>
+
+  <div class="slides-wrap" id="slides-wrap"></div>
+  <div class="dots" id="dots"></div>
+  <button class="nav-arrow prev" onclick="changeSlide(-1)">&#8592;</button>
+  <button class="nav-arrow next" onclick="changeSlide(1)">&#8594;</button>
+  <div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<!-- ─── EDIT MODAL ─── -->
+<div id="edit-modal">
+  <div class="modal-box">
+    <button class="close-modal" onclick="closeModal()">✕</button>
+    <h3>Personalizar</h3>
+    <p>Cole o link de uma foto (URL) e escreva uma legenda romântica para cada slide.</p>
+    <label>URL da Foto</label>
+    <input type="text" id="modal-url" placeholder="https://..." />
+    <label>Legenda</label>
+    <textarea id="modal-caption" rows="2" placeholder="Aquele dia especial..."></textarea>
+    <label>Link do YouTube (música)</label>
+    <input type="text" id="modal-yt" placeholder="https://www.youtube.com/watch?v=..." />
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveSlide()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG: troque as URLs pelas suas fotos e as legendas ──────────────────
+const slides = [
+  { url: 'imagens/1.jpeg',  caption: 'Cada momento ao seu lado é perfeito…' },
+  { url: 'imagens/2.jpeg',  caption: 'Te encontrar foi o maior presente da minha vida.' },
+  { url: 'imagens/3.jpeg',  caption: 'Perto de você, o mundo fica mais bonito.' },
+  { url: 'imagens/4.jpeg',  caption: 'Meu coração só sabe o seu nome.' },
+  { url: 'imagens/5.jpeg',  caption: 'Para sempre é pouco para o que sinto por você.' },
+  { url: 'imagens/6.jpeg',  caption: 'Você é a razão de cada sorriso meu.' },
+  { url: 'imagens/7.jpeg',  caption: 'No seu olhar eu encontrei o meu lar.' },
+  { url: 'imagens/8.jpeg',  caption: 'Cada abraço seu é onde o tempo para.' },
+  { url: 'imagens/9.jpeg',  caption: 'Amar você é a coisa mais bonita que me aconteceu.' },
+  { url: 'imagens/10.jpeg', caption: 'Você chegou e tudo fez sentido.' },
+  { url: 'imagens/11.jpeg', caption: 'Com você aprendi que o amor é lugar.' },
+  { url: 'imagens/12.jpeg', caption: 'Até o silêncio é lindo quando estamos juntos.' },
+  { url: 'imagens/13.jpeg', caption: 'Seu sorriso é a minha cena favorita da vida.' },
+  { url: 'imagens/14.jpeg', caption: 'Se o amor tivesse rosto, seria o seu.' },
+  { url: 'imagens/15.jpeg', caption: 'Toda história bonita começa com um encontro assim.' },
+  { url: 'imagens/16.jpeg', caption: 'Você é a música que fica na cabeça e no coração.' },
+  { url: 'imagens/17.jpeg', caption: 'O meu favorito é cada versão sua.' },
+  { url: 'imagens/18.jpeg', caption: 'Ao seu lado até os dias comuns viram memória.' },
+  { url: 'imagens/19.jpeg', caption: 'Escolho você todos os dias, sem hesitar.' },
+  { url: 'imagens/20.jpeg', caption: 'Sua voz é o som mais bonito que conheço.' },
+  { url: 'imagens/21.jpeg', caption: 'Me perdi em você e não quero ser encontrado.' },
+  { url: 'imagens/22.jpeg', caption: 'Cada foto nossa guarda um pedaço da eternidade.' },
+  { url: 'imagens/23.jpeg', caption: 'Com você, até a saudade tem sabor de doce.' },
+  { url: 'imagens/24.jpeg', caption: 'Você é o pensamento que me aquece nos dias frios.' },
+  { url: 'imagens/25.jpeg', caption: 'O universo inteiro conspirou para nos juntar.' },
+  { url: 'imagens/26.jpeg', caption: 'No mapa da minha vida, você é o ponto de chegada.' },
+  { url: 'imagens/27.jpeg', caption: 'Te amar é fácil como respirar.' },
+  { url: 'imagens/28.jpeg', caption: 'Você é a parte da história que eu quero reler.' },
+  { url: 'imagens/29.jpeg', caption: 'Meu coração aprendeu seu jeito e não quer esquecer.' },
+  { url: 'imagens/30.jpeg', caption: 'Sorrir ficou mais gostoso depois que você chegou.' },
+  { url: 'imagens/31.jpeg', caption: 'Você é tudo que eu não sabia que precisava.' }
+];
+
+// Cole aqui o link do seu YouTube (pode colar depois clicando em ♪ Música)
+let ytVideoId = '42QG9tIHRsQ';
+
+// ────────────────────────────────────────────────────────────────────────────
+
+let current = 0;
+let timer = null;
+let progressAnim = null;
+const INTERVAL = 5000;
+let ytPlayer = null;
+let ytReady = false;
+let musicOn = false;
+let editingIndex = -1;
+
+// Petals
+const petals = document.getElementById('petals');
+for (let i = 0; i < 26; i++) {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.style.cssText = `
+    left: ${Math.random()*100}%;
+    width: ${8+Math.random()*12}px;
+    height: ${8+Math.random()*12}px;
+    animation-duration: ${6+Math.random()*8}s;
+    animation-delay: ${Math.random()*10}s;
+    opacity: ${0.4+Math.random()*0.5};
+  `;
+  petals.appendChild(p);
+}
+
+// Build slides
+function buildCarousel() {
+  const wrap = document.getElementById('slides-wrap');
+  const dotsEl = document.getElementById('dots');
+  wrap.innerHTML = '';
+  dotsEl.innerHTML = '';
+
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === current ? ' active' : '');
+    div.innerHTML = `<img src="${s.url}" alt=""><div class="caption"><div class="caption-text">${s.caption}</div></div>`;
+    div.ondblclick = () => openModal(i);
+    wrap.appendChild(div);
+
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === current ? ' active' : '');
+    dot.onclick = () => goTo(i);
+    dotsEl.appendChild(dot);
+  });
+}
+
+function goTo(idx) {
+  const allSlides = document.querySelectorAll('.slide');
+  const allDots   = document.querySelectorAll('.dot');
+  allSlides[current].classList.remove('active');
+  allDots[current].classList.remove('active');
+  current = (idx + slides.length) % slides.length;
+  allSlides[current].classList.add('active');
+  allDots[current].classList.add('active');
+  resetProgress();
+}
+
+function changeSlide(dir) { goTo(current + dir); }
+
+function resetProgress() {
+  clearInterval(progressAnim);
+  const bar = document.getElementById('progress-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = `width ${INTERVAL}ms linear`;
+      bar.style.width = '100%';
+    });
+  });
+  clearInterval(timer);
+  timer = setInterval(() => goTo(current + 1), INTERVAL);
+}
+
+// Entry button
+document.getElementById('enter-btn').addEventListener('click', () => {
+  document.getElementById('entry').classList.add('hidden');
+  const screen = document.getElementById('carousel-screen');
+  screen.classList.add('visible');
+  buildCarousel();
+  resetProgress();
+  loadYT();
+});
+
+// ── YouTube ──────────────────────────────────────────────────────────────────
+function loadYT() {
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.body.appendChild(tag);
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  ytReady = true;
+  createPlayer();
+};
+
+function createPlayer() {
+  const container = document.getElementById('yt-player');
+  container.innerHTML = '';
+  ytPlayer = new YT.Player('yt-player', {
+    videoId: ytVideoId,
+    playerVars: { autoplay: 1, loop: 1, playlist: ytVideoId, controls: 0, rel: 0, mute: 0 },
+    events: {
+      onReady: (e) => { e.target.setVolume(70); e.target.playVideo(); musicOn = true; }
+    }
+  });
+}
+
+function toggleMusic(e) {
+  e.preventDefault();
+  if (!ytPlayer) return;
+  if (musicOn) { ytPlayer.pauseVideo(); musicOn = false; }
+  else         { ytPlayer.playVideo();  musicOn = true; }
+}
+
+// ── Edit modal ───────────────────────────────────────────────────────────────
+function openModal(idx) {
+  editingIndex = idx;
+  document.getElementById('modal-url').value     = slides[idx].url;
+  document.getElementById('modal-caption').value = slides[idx].caption;
+  document.getElementById('modal-yt').value      = ytVideoId || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  editingIndex = -1;
+}
+
+function saveSlide() {
+  const url     = document.getElementById('modal-url').value.trim();
+  const caption = document.getElementById('modal-caption').value.trim();
+  const yt      = document.getElementById('modal-yt').value.trim();
+
+  if (editingIndex >= 0 && url) {
+    slides[editingIndex].url     = url;
+    slides[editingIndex].caption = caption;
+  }
+
+  if (yt) {
+    const match = yt.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+    if (match) {
+      ytVideoId = match[1];
+      if (ytPlayer) { ytPlayer.loadVideoById(ytVideoId); ytPlayer.playVideo(); musicOn = true; }
+    }
+  }
+
+  buildCarousel();
+  closeModal();
+}
+
+// Hint after entry
+setTimeout(() => {
+  const hint = document.createElement('div');
+  hint.style.cssText = 'position:fixed;bottom:90px;right:22px;background:rgba(26,10,14,0.7);border:1px solid rgba(201,169,110,0.3);color:#e8a0a3;font-size:0.7rem;letter-spacing:0.12em;padding:8px 14px;z-index:30;opacity:0;transition:opacity 0.6s;pointer-events:none;backdrop-filter:blur(4px);';
+  hint.textContent = 'Dica: clique duplo em qualquer foto para editar';
+  document.body.appendChild(hint);
+  setTimeout(() => { hint.style.opacity = '1'; }, 100);
+  setTimeout(() => { hint.style.opacity = '0'; }, 5000);
+  setTimeout(() => hint.remove(), 6000);
+}, 3500);
+</script>
+</body>
+</html>
