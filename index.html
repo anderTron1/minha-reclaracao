@@ -349,7 +349,6 @@
     <label>Legenda</label>
     <textarea id="modal-caption" rows="2" placeholder="Aquele dia especial..."></textarea>
 
-    <input type="text" id="modal-yt" placeholder="https://www.youtube.com/watch?v=..." />
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
       <button class="btn-save" onclick="saveSlide()">Salvar</button>
@@ -484,23 +483,28 @@ document.getElementById('enter-btn').addEventListener('click', () => {
 
 
 
-function toggleMusic(e) {
-  e.preventDefault();
 
-  if (musicOn) {
-    audio.pause();
-    musicOn = false;
-  } else {
-    audio.play();
-    musicOn = true;
-  }
+async function toggleMusic(e) {
+    e.preventDefault();
+
+    try {
+        if (!musicOn) {
+            await audio.play();
+            musicOn = true;
+        } else {
+            audio.pause();
+            musicOn = false;
+        }
+    } catch(err) {
+        console.error(err);
+        alert("Não foi possível reproduzir a música.");
+    }
 }
 // ── Edit modal ───────────────────────────────────────────────────────────────
 function openModal(idx) {
   editingIndex = idx;
-  document.getElementById('modal-url').value     = slides[idx].url;
+  document.getElementById('modal-url').value = slides[idx].url;
   document.getElementById('modal-caption').value = slides[idx].caption;
-  document.getElementById('modal-yt').value      = ytVideoId || '';
   document.getElementById('edit-modal').classList.add('open');
 }
 
@@ -510,21 +514,12 @@ function closeModal() {
 }
 
 function saveSlide() {
-  const url     = document.getElementById('modal-url').value.trim();
+  const url = document.getElementById('modal-url').value.trim();
   const caption = document.getElementById('modal-caption').value.trim();
-  const yt      = document.getElementById('modal-yt').value.trim();
 
   if (editingIndex >= 0 && url) {
-    slides[editingIndex].url     = url;
+    slides[editingIndex].url = url;
     slides[editingIndex].caption = caption;
-  }
-
-  if (yt) {
-    const match = yt.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
-    if (match) {
-      ytVideoId = match[1];
-      if (ytPlayer) { ytPlayer.loadVideoById(ytVideoId); ytPlayer.playVideo(); musicOn = true; }
-    }
   }
 
   buildCarousel();
